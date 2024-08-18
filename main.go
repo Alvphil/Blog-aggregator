@@ -17,6 +17,8 @@ type apiConfig struct {
 	DB *database.Queries
 }
 
+type authHandler func(http.ResponseWriter, *http.Request, database.User)
+
 func main() {
 	godotenv.Load()
 	const filepathRoot = "."
@@ -45,7 +47,8 @@ func main() {
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerErrors)
 	v1Router.Post("/users", apiCfg.CreateUser)
-	v1Router.Get("/users", apiCfg.GetUserByApiKey)
+	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.GetUserByApiKey))
+	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
 
 	router.Mount("/v1", v1Router)
 
