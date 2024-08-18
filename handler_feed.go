@@ -37,9 +37,21 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 		UserID:    user.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusNotAcceptable, "Couldn't add feed")
+		respondWithError(w, http.StatusBadRequest, "Couldn't add feed")
 	} else {
 		respondWithJSON(w, http.StatusCreated, databaseFeedToFeed(feed))
 	}
 
+}
+
+func (cfg *apiConfig) handlerGetAllFeeds(w http.ResponseWriter, r *http.Request) {
+	feedsUnsanitized, err := cfg.DB.GetAllFeeds(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, "Found no feeds")
+	}
+	var feeds = []Feed{}
+	for _, f := range feedsUnsanitized {
+		feeds = append(feeds, databaseFeedToFeed(f))
+	}
+	respondWithJSON(w, http.StatusOK, feeds)
 }
