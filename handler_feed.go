@@ -55,3 +55,4 @@ func (cfg *apiConfig) handlerGetAllFeeds(w http.ResponseWriter, r *http.Request)
 	}
 	respondWithJSON(w, http.StatusOK, feeds)
 }
+
