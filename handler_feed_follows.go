@@ -45,7 +45,6 @@ func (cfg *apiConfig) handlerPostFollowFeed(w http.ResponseWriter, r *http.Reque
 
 func (cfg *apiConfig) handlerDeleteFollowFeed(w http.ResponseWriter, r *http.Request, user database.User) {
 	string_Feed_id := chi.URLParam(r, "feedFollowId")
-	fmt.Println(string_Feed_id)
 	Feed_id, err := uuid.Parse(string_Feed_id)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Invalid feedID: %v", Feed_id.String()))

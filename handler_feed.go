@@ -26,10 +26,9 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 	}
 
 	currentTime := time.Now()
-	uuid := uuid.New()
 
 	feed, err := cfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
-		ID:        uuid,
+		ID:        uuid.New(),
 		CreatedAt: currentTime.UTC(),
 		UpdatedAt: currentTime.UTC(),
 		Name:      params.Name,
@@ -38,8 +37,19 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 	})
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Couldn't add feed")
+	}
+
+	followfeed, err := cfg.DB.FollowFeed(r.Context(), database.FollowFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: currentTime.UTC(),
+		UpdatedAt: currentTime.UTC(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Couldn't add feed")
 	} else {
-		respondWithJSON(w, http.StatusCreated, databaseFeedToFeed(feed))
+		respondWithJSON(w, http.StatusCreated, databaseCreateAndFollow(databaseFeedToFeed(feed), databaseFollowFeed(followfeed)))
 	}
 
 }
@@ -55,4 +65,3 @@ func (cfg *apiConfig) handlerGetAllFeeds(w http.ResponseWriter, r *http.Request)
 	}
 	respondWithJSON(w, http.StatusOK, feeds)
 }
-

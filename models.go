@@ -62,3 +62,15 @@ func databaseFollowFeed(dbfeed database.FeedFollow) FollowFeed {
 		FeedID:    dbfeed.FeedID,
 	}
 }
+
+type CreateAndFollow struct {
+	Feed       Feed       `json:"feed"`
+	FeedFollow FollowFeed `json:"feed_follow"`
+}
+
+func databaseCreateAndFollow(feed Feed, feedFollow FollowFeed) CreateAndFollow {
+	return CreateAndFollow{
+		Feed:       feed,
+		FeedFollow: feedFollow,
+	}
+}
