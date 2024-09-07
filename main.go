@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Alvphil/Blog-aggregator/internal/database"
 	"github.com/go-chi/chi"
@@ -20,6 +21,7 @@ type apiConfig struct {
 type authHandler func(http.ResponseWriter, *http.Request, database.User)
 
 func main() {
+
 	godotenv.Load()
 	const filepathRoot = "."
 	dbURL := os.Getenv("CONN")
@@ -32,6 +34,7 @@ func main() {
 		DB: dbQueries,
 	}
 
+	go startScraping(dbQueries, 10, 60*time.Second)
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
@@ -52,6 +55,7 @@ func main() {
 	v1Router.Get("/feeds", apiCfg.handlerGetAllFeeds)
 	v1Router.Post("/feeds_follows", apiCfg.middlewareAuth(apiCfg.handlerPostFollowFeed))
 	v1Router.Get("/feeds_follows", apiCfg.middlewareAuth(apiCfg.handlerGetAllFollowFeeds))
+	v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.GetPostsByUser))
 	v1Router.Delete("/feeds_follows/{feedFollowId}", apiCfg.middlewareAuth(apiCfg.handlerDeleteFollowFeed))
 
 	router.Mount("/v1", v1Router)

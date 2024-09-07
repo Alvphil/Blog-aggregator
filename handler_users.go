@@ -43,3 +43,14 @@ func (cfg *apiConfig) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (cfg *apiConfig) GetUserByApiKey(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }
+
+func (cfg *apiConfig) GetPostsByUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	posts, err := cfg.DB.GetPostsForUser(r.Context(), database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusNoContent, "Couldn't fetch posts")
+	}
+	respondWithJSON(w, http.StatusOK, databasePostsToPosts(posts))
+}
